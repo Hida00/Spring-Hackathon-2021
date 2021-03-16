@@ -5,8 +5,10 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class PictureController : MonoBehaviour , IDragHandler , IDropHandler , IBeginDragHandler
+public class PictureController : MonoBehaviour , IDragHandler , IDropHandler
 {
+    [NonSerialized]
+    public int targetNum;
     [NonSerialized]
     public string targetName;
     [NonSerialized]
@@ -30,10 +32,6 @@ public class PictureController : MonoBehaviour , IDragHandler , IDropHandler , I
             isStart = false;
 		}
     }
-    public void OnBeginDrag(PointerEventData e)
-	{
-
-	}
     public void OnDrag(PointerEventData e)
 	{
         this.transform.position = e.position;
@@ -55,8 +53,8 @@ public class PictureController : MonoBehaviour , IDragHandler , IDropHandler , I
 			{
                 targetPanel = hit.gameObject;
                 this.transform.position = hit.gameObject.transform.position;
-                Debug.Log("hit");
                 pictureMatchingController.PanelCountChange(false);
+                if(targetName == hit.gameObject.name) pictureMatchingController.ParticlePlay(targetNum);
             }
 		}
 	}
