@@ -29,6 +29,7 @@ public class PictureMatchingController : MonoBehaviour
     Transform canvasTransform;
 
     int PanelCount;
+    int ImageNum;
 
     void Start()
     {
@@ -41,7 +42,8 @@ public class PictureMatchingController : MonoBehaviour
     {
         if(PanelCount == 9)
         {
-            Invoke(nameof(Finish) , 1.5f);
+            Invoke(nameof(Clear) , 0.5f);
+            Invoke(nameof(Finish) , 3.5f);
         }
         if(Input.GetKeyDown(KeyCode.B))
 		{
@@ -54,6 +56,7 @@ public class PictureMatchingController : MonoBehaviour
         canvasTransform = GameObject.Find("Canvas").transform;
 
         nullPanelIns = Instantiate(nullPanel , canvasTransform);
+        nullPanelIns.name = "NullPanel";
 
         pictureParts = new Image[9];
         picturePanels = new GameObject[9];
@@ -70,6 +73,7 @@ public class PictureMatchingController : MonoBehaviour
         }
 
         var particleObject = Instantiate(particles).transform;
+        ImageNum = UnityEngine.Random.Range(0 , 10) % 2;
 
         for(int i = 0; i < 9; i++)
 		{
@@ -84,8 +88,9 @@ public class PictureMatchingController : MonoBehaviour
             pictureParts[i].GetComponent<PictureController>().targetNum = i;
             pictureParts[i].rectTransform.anchoredPosition = new Vector2(120 + 120 * x + dif, -(120 * y) + dif);
             pictureParts[i].name = $"picture{i + 1}";
-            pictureParts[i].GetComponent<Image>().sprite = GetSprite("lavender" + ( i + 1 ).ToString() + ".jpg");
+            pictureParts[i].GetComponent<Image>().sprite = GetSprite(SetImages(ImageNum) + ( i + 1 ).ToString() + ".jpg");
             pictureParts[i].GetComponent<PictureController>().isStart = true;
+            pictureParts[i].GetComponent<PictureController>().targetController = nullPanelIns.GetComponent<PicturePanelController>();
 
             lightParticles[i] = Instantiate(lightParticle , particleObject);
             lightParticles[i].transform.position = new Vector3(65 + 65 * x , -(65 * y) , 200);
@@ -100,10 +105,18 @@ public class PictureMatchingController : MonoBehaviour
         Sprite sp = Sprite.Create(texture , new Rect(0 , 0 , texture.width , texture.height) , new Vector2(0.5f , 0.5f));
         return sp;
 	}
+    void Clear()
+    {
+        Debug.Log("OK");
+        foreach(var obj in pictureParts) Destroy(obj);
+        var img = Instantiate(picturePart , canvasTransform);
+        img.rectTransform.sizeDelta = new Vector2(300 , 300);
+        img.rectTransform.anchoredPosition = new Vector2(0 , 0);
+        img.sprite = GetSprite(SetImages(ImageNum) + ".jpg");
+    }
     void Finish()
 	{
         foreach(var obj in picturePanels) Destroy(obj);
-        foreach(var obj in pictureParts)  Destroy(obj);
         Destroy(nullPanelIns);
         Destroy(this.gameObject);
 	}
@@ -112,9 +125,28 @@ public class PictureMatchingController : MonoBehaviour
         if(isSubtraction) PanelCount--;
         else PanelCount++;
 	}
-    public void ParticlePlay(int particleNum)
+    public void ParticlePlay(int particleNum,bool isSubtraction)
 	{
-        lightParticles[particleNum].Play();
-        picturePanels[particleNum].GetComponent<Image>().color = new Color(255f / 255f , 128f / 255f , 128f / 255f);
+        if(isSubtraction)
+        {
+            picturePanels[particleNum].GetComponent<Image>().color = new Color(255f , 255f , 255f , 100f / 255f);
+        }
+        else
+        {
+            lightParticles[particleNum].Play();
+            picturePanels[particleNum].GetComponent<Image>().color = new Color(255f / 255f , 128f / 255f , 128f / 255f);
+        }
+	}
+    public string SetImages(int num)
+	{
+        switch(num)
+		{
+			case 0:
+                return "lavender";
+			case 1:
+                return "mountain";
+            default:
+                return "mountain";
+        }
 	}
 }

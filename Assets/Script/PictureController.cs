@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class PictureController : MonoBehaviour , IDragHandler , IDropHandler
+public class PictureController : MonoBehaviour , IDragHandler , IDropHandler ,IBeginDragHandler
 {
     [NonSerialized]
     public int targetNum;
@@ -13,6 +13,8 @@ public class PictureController : MonoBehaviour , IDragHandler , IDropHandler
     public string targetName;
     [NonSerialized]
     public GameObject targetPanel;
+    [NonSerialized]
+    public PicturePanelController targetController;
 
     PictureMatchingController pictureMatchingController;
 
@@ -27,11 +29,17 @@ public class PictureController : MonoBehaviour , IDragHandler , IDropHandler
 
     void Update()
     {
-        if(isStart && targetPanel.name == targetName)
-		{
-            isStart = false;
-		}
+
     }
+    public void OnBeginDrag(PointerEventData e)
+	{
+        pictureMatchingController.PanelCountChange(true);
+        if(targetPanel.name != "NullPanel")
+        {
+            pictureMatchingController.ParticlePlay(targetNum , true);
+            targetController.isHold = false;
+        }
+	}
     public void OnDrag(PointerEventData e)
 	{
         this.transform.position = e.position;
@@ -49,12 +57,15 @@ public class PictureController : MonoBehaviour , IDragHandler , IDropHandler
 
         foreach(var hit in rayCastResult)
 		{
-            if(hit.gameObject.CompareTag("Drop"))
+            if(hit.gameObject.CompareTag("Drop") && !hit.gameObject.GetComponent<PicturePanelController>().isHold)
 			{
+                Debug.Log("Drop");
                 targetPanel = hit.gameObject;
+                targetController = targetPanel.GetComponent<PicturePanelController>();
+                targetController.isHold = true;
                 this.transform.position = hit.gameObject.transform.position;
                 pictureMatchingController.PanelCountChange(false);
-                if(targetName == hit.gameObject.name) pictureMatchingController.ParticlePlay(targetNum);
+                if(targetName == hit.gameObject.name) pictureMatchingController.ParticlePlay(targetNum , false);
             }
 		}
 	}
