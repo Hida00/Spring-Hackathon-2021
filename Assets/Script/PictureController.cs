@@ -20,7 +20,8 @@ public class PictureController : MonoBehaviour , IDragHandler , IDropHandler ,IB
 
     [NonSerialized]
     public bool isStart = false;
-    bool isFirst = true;
+
+    bool isClear = false;
 
     void Start()
     {
@@ -29,16 +30,10 @@ public class PictureController : MonoBehaviour , IDragHandler , IDropHandler ,IB
 
     void Update()
     {
-
+        if(Input.GetKeyDown(KeyCode.V)) Debug.Log($"{this.name}:{isClear}");
     }
     public void OnBeginDrag(PointerEventData e)
 	{
-        pictureMatchingController.PanelCountChange(true);
-        if(targetPanel.name != "NullPanel")
-        {
-            pictureMatchingController.ParticlePlay(targetNum , true);
-            targetController.isHold = false;
-        }
 	}
     public void OnDrag(PointerEventData e)
 	{
@@ -46,27 +41,50 @@ public class PictureController : MonoBehaviour , IDragHandler , IDropHandler ,IB
 	}
     public void OnDrop(PointerEventData e)
     {
-        if(isFirst)
-        {
-            isFirst = false;
-        }
-        else pictureMatchingController.PanelCountChange(true);
+        bool isHit = false;
 
         var rayCastResult = new List<RaycastResult>();
         EventSystem.current.RaycastAll(e , rayCastResult);
 
+        if(targetController.isHold)
+        {
+            targetController.isHold = false;
+            pictureMatchingController.ParticlePlay(targetNum , true);
+        }
+
         foreach(var hit in rayCastResult)
-		{
+        {
             if(hit.gameObject.CompareTag("Drop") && !hit.gameObject.GetComponent<PicturePanelController>().isHold)
-			{
-                Debug.Log("Drop");
+            {
+                isHit = true;
                 targetPanel = hit.gameObject;
                 targetController = targetPanel.GetComponent<PicturePanelController>();
                 targetController.isHold = true;
                 this.transform.position = hit.gameObject.transform.position;
-                pictureMatchingController.PanelCountChange(false);
-                if(targetName == hit.gameObject.name) pictureMatchingController.ParticlePlay(targetNum , false);
+                if(targetName == hit.gameObject.name)
+                {
+                    isClear = true;
+                    pictureMatchingController.ParticlePlay(targetNum , false);
+                    pictureMatchingController.PanelCountChange(false);
+                }
+                else if(isClear)
+                {
+                    pictureMatchingController.PanelCountChange(true);
+                    isClear = false;
+                }
             }
+            //else if(!hit.gameObject.CompareTag("Picture"))
+            //{
+            //    isClear = false;
+            //    pictureMatchingController.PanelCountChange(true);
+            //    Debug.Log($"else {hit.gameObject.name}");
+            //}
+        }
+        if(!isHit && isClear)
+		{
+            isClear = false;
+			pictureMatchingController.PanelCountChange(true);
+			Debug.Log($"else");
 		}
-	}
+    }
 }

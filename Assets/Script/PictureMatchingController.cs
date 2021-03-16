@@ -26,10 +26,14 @@ public class PictureMatchingController : MonoBehaviour
     [SerializeField]
     GameObject particles;
 
+    Image clearImg;
+
     Transform canvasTransform;
 
     int PanelCount;
     int ImageNum;
+
+    bool isFinish = false;
 
     void Start()
     {
@@ -40,10 +44,11 @@ public class PictureMatchingController : MonoBehaviour
 
     void Update()
     {
-        if(PanelCount == 9)
+        if(PanelCount == 9 && !isFinish)
         {
             Invoke(nameof(Clear) , 0.5f);
-            Invoke(nameof(Finish) , 3.5f);
+            Invoke(nameof(Finish) , 2.0f);
+            isFinish = true;
         }
         if(Input.GetKeyDown(KeyCode.B))
 		{
@@ -80,13 +85,14 @@ public class PictureMatchingController : MonoBehaviour
             int x = i % 3 - 2;
             int y = i / 3 - 1;
 
-            int dif = UnityEngine.Random.Range(-30 , 30);
+            int dif1 = UnityEngine.Random.Range(-30 , 30);
+            int dif2 = UnityEngine.Random.Range(-30 , 30);
 
             pictureParts[i] = Instantiate(picturePart , canvasTransform);
             pictureParts[i].GetComponent<PictureController>().targetPanel = nullPanelIns;
             pictureParts[i].GetComponent<PictureController>().targetName = picturePanels[i].name;
             pictureParts[i].GetComponent<PictureController>().targetNum = i;
-            pictureParts[i].rectTransform.anchoredPosition = new Vector2(120 + 120 * x + dif, -(120 * y) + dif);
+            pictureParts[i].rectTransform.anchoredPosition = new Vector2(120f * dif1 / 30f, 120f * dif2 / 30f);
             pictureParts[i].name = $"picture{i + 1}";
             pictureParts[i].GetComponent<Image>().sprite = GetSprite(SetImages(ImageNum) + ( i + 1 ).ToString() + ".jpg");
             pictureParts[i].GetComponent<PictureController>().isStart = true;
@@ -107,23 +113,23 @@ public class PictureMatchingController : MonoBehaviour
 	}
     void Clear()
     {
-        Debug.Log("OK");
         foreach(var obj in pictureParts) Destroy(obj);
-        var img = Instantiate(picturePart , canvasTransform);
-        img.rectTransform.sizeDelta = new Vector2(300 , 300);
-        img.rectTransform.anchoredPosition = new Vector2(0 , 0);
-        img.sprite = GetSprite(SetImages(ImageNum) + ".jpg");
+        clearImg = Instantiate(picturePart , canvasTransform);
+        clearImg.rectTransform.sizeDelta = new Vector2(300 , 300);
+        clearImg.rectTransform.anchoredPosition = new Vector2(0 , 0);
+        clearImg.sprite = GetSprite(SetImages(ImageNum) + ".jpg");
     }
     void Finish()
 	{
         foreach(var obj in picturePanels) Destroy(obj);
         Destroy(nullPanelIns);
+        Destroy(clearImg);
         Destroy(this.gameObject);
 	}
     public void PanelCountChange(bool isSubtraction)
 	{
-        if(isSubtraction) PanelCount--;
-        else PanelCount++;
+		if(isSubtraction) PanelCount--;
+		else PanelCount++;
 	}
     public void ParticlePlay(int particleNum,bool isSubtraction)
 	{
