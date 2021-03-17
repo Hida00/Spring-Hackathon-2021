@@ -19,13 +19,6 @@ public class PictureMatchingController : MonoBehaviour
     GameObject nullPanel;
     GameObject nullPanelIns;
 
-    [SerializeField]
-    ParticleSystem lightParticle;
-    ParticleSystem[] lightParticles;
-
-    [SerializeField]
-    GameObject particles;
-
     Image clearImg;
 
     Transform canvasTransform;
@@ -65,7 +58,6 @@ public class PictureMatchingController : MonoBehaviour
 
         pictureParts = new Image[9];
         picturePanels = new GameObject[9];
-        lightParticles = new ParticleSystem[9];
 
         for(int i = 0 ;i < 9 ;i++)
         {
@@ -77,7 +69,6 @@ public class PictureMatchingController : MonoBehaviour
             picturePanels[i].name = $"picturePanel{i + 1}";
         }
 
-        var particleObject = Instantiate(particles).transform;
         ImageNum = UnityEngine.Random.Range(0 , 10) % 2;
 
         for(int i = 0; i < 9; i++)
@@ -94,21 +85,15 @@ public class PictureMatchingController : MonoBehaviour
             pictureParts[i].GetComponent<PictureController>().targetNum = i;
             pictureParts[i].rectTransform.anchoredPosition = new Vector2(120f * dif1 / 30f, 120f * dif2 / 30f);
             pictureParts[i].name = $"picture{i + 1}";
-            pictureParts[i].GetComponent<Image>().sprite = GetSprite(SetImages(ImageNum) + ( i + 1 ).ToString() + ".jpg");
+            pictureParts[i].GetComponent<Image>().sprite = GetSprite(SetImages(ImageNum) + ( i + 1 ).ToString());
             pictureParts[i].GetComponent<PictureController>().isStart = true;
             pictureParts[i].GetComponent<PictureController>().targetController = nullPanelIns.GetComponent<PicturePanelController>();
-
-            lightParticles[i] = Instantiate(lightParticle , particleObject);
-            lightParticles[i].transform.position = new Vector3(65 + 65 * x , -(65 * y) , 200);
         }
 	}
     Sprite GetSprite(string imagePath)
 	{
-        string url = Application.dataPath + "/Images/" + imagePath;
-        var bytes = File.ReadAllBytes(url);
-        Texture2D texture = new Texture2D(4 , 4 , TextureFormat.RGBA32 , false);
-        texture.LoadImage(bytes);
-        Sprite sp = Sprite.Create(texture , new Rect(0 , 0 , texture.width , texture.height) , new Vector2(0.5f , 0.5f));
+        string url = "Images/" + imagePath;
+        Sprite sp = Resources.Load<Sprite>(url);
         return sp;
 	}
     void Clear()
@@ -117,7 +102,7 @@ public class PictureMatchingController : MonoBehaviour
         clearImg = Instantiate(picturePart , canvasTransform);
         clearImg.rectTransform.sizeDelta = new Vector2(300 , 300);
         clearImg.rectTransform.anchoredPosition = new Vector2(0 , 0);
-        clearImg.sprite = GetSprite(SetImages(ImageNum) + ".jpg");
+        clearImg.sprite = GetSprite(SetImages(ImageNum));
     }
     void Finish()
 	{
@@ -139,7 +124,6 @@ public class PictureMatchingController : MonoBehaviour
         }
         else
         {
-            lightParticles[particleNum].Play();
             picturePanels[particleNum].GetComponent<Image>().color = new Color(255f / 255f , 128f / 255f , 128f / 255f);
         }
 	}
