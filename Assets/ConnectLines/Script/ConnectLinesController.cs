@@ -38,54 +38,64 @@ public class ConnectLinesController : MonoBehaviour
             int y = i / 4 - 1;
 
             int num = UnityEngine.Random.Range(0 , 4);
+            int angleCount = UnityEngine.Random.Range(0 , 4);
 
             connectImages[i] = Instantiate(connectImage , canvasTransform);
-            controllers[i] = connectImages[i].GetComponent<ConnectImageController>();
             connectImages[i].rectTransform.anchoredPosition = new Vector2(45 + 95 * x , -( -45 + 95 * y ));
             connectImages[i].name = $"ConnectImage{i}";
-
-            int angleCount = UnityEngine.Random.Range(0 , 4);
+            controllers[i] = connectImages[i].GetComponent<ConnectImageController>();
+            controllers[i].controller = this;
+            controllers[i].placeNum = i;
 
             string imageName;
 
             if(i == start)
-			{
+            {
                 imageName = "Start";
-                connectImages[i].transform.Rotate(Vector3.forward * 90 * angleCount);
                 connectImages[i].sprite = GetSprite(imageName);
-                num = 5;
+                controllers[i].imageNum = 5;
+                controllers[i].SetConnectData(5);
+                controllers[i].ConnectRotate(angleCount);
+                controllers[i].isLighting = true;
+                while(!controllers[i].IsDirectionOK()) controllers[i].ConnectRotate(1);
             }
             else if(i == end)
             {
                 imageName = "End";
-                connectImages[i].transform.Rotate(Vector3.forward * 90 * angleCount);
                 connectImages[i].sprite = GetSprite(imageName + "_No");
-                num = 6;
+                controllers[i].imageNum = 6;
+                controllers[i].SetConnectData(6);
+                controllers[i].ConnectRotate(angleCount);
+                controllers[i].isLighting = false;
+                while(!controllers[i].IsDirectionOK()) controllers[i].ConnectRotate(1);
             }
             else
-			{
-                imageName = GetImageName(num);
+            {
                 angleCount = 0;
+                imageName = GetImageName(num);
+                controllers[i].SetConnectData(num);
+                controllers[i].imageNum = num;
+                controllers[i].ConnectRotate(angleCount);
+                controllers[i].isLighting = false;
                 connectImages[i].sprite = GetSprite(imageName + "_No");
             }
-            controllers[i].imageNum = num;
-            controllers[i].placeNum = i;
-            controllers[i].SetConnectData(num);
-            controllers[i].ConnectRotate(angleCount);
             controllers[i].imageName = imageName;
-            controllers[i].controller = this;
+            connectImages[i].name = controllers[i].GetData();
         }
     }
+    public void LitImage(int litTo,int dirFrom,bool isLighting)
+	{
+        if(isLighting && !controllers[litTo].isLighting)
+        {
+            controllers[litTo].LightChange(isLighting);
+            controllers[litTo].CheckNextImage(dirFrom);
+        }
+	}
     public static Sprite GetSprite(string url)
 	{
         string path = "Images/ConnectLines/" + url;
         Sprite sp = Resources.Load<Sprite>(path);
         return sp;
-	}
-    public void LightChange(int dirNum,bool isLight,int dir,string test)
-	{
-        //Debug.Log($"Connect{connectImages[dirNum]}");
-        controllers[dirNum].LightPropagation(dir , isLight);
 	}
     string GetImageName(int num)
     {
@@ -103,4 +113,11 @@ public class ConnectLinesController : MonoBehaviour
                 return "Cross";
         }
     }
+    public static Dictionary<int , string> Directions = new Dictionary<int , string>()
+    {
+        { 0 , "Up" },
+        { 1 , "Down" },
+        { 2 , "Right" },
+        { 3 , "Left" }
+    };
 }
