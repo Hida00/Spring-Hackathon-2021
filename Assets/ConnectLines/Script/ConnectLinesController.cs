@@ -22,6 +22,15 @@ public class ConnectLinesController : MonoBehaviour
     {
         
     }
+    public void Clear()
+	{
+        Invoke(nameof(Finish) , 1.5f);
+	}
+    public void Finish()
+	{
+        foreach(var obj in connectImages) Destroy(obj);
+        //Destroy(this.gameObject);
+	}
     void Initialize()
 	{
         connectImages = new Image[16];
@@ -42,7 +51,6 @@ public class ConnectLinesController : MonoBehaviour
 
             connectImages[i] = Instantiate(connectImage , canvasTransform);
             connectImages[i].rectTransform.anchoredPosition = new Vector2(45 + 95 * x , -( -45 + 95 * y ));
-            connectImages[i].name = $"ConnectImage{i}";
             controllers[i] = connectImages[i].GetComponent<ConnectImageController>();
             controllers[i].controller = this;
             controllers[i].placeNum = i;
@@ -83,12 +91,17 @@ public class ConnectLinesController : MonoBehaviour
             connectImages[i].name = controllers[i].GetData();
         }
     }
-    public void LitImage(int litTo,int dirFrom,bool isLighting)
+    public void LitImage(int litTo,int dirFrom,bool isLighting ,int startNum = -1)
 	{
         if(isLighting && !controllers[litTo].isLighting)
         {
-            controllers[litTo].LightChange(isLighting);
+            controllers[litTo].LightChange(isLighting , dirFrom);
             controllers[litTo].CheckNextImage(dirFrom);
+        }
+        else if(!isLighting && controllers[litTo].isLighting)
+        {
+            controllers[litTo].LightChange(isLighting , dirFrom , startNum);
+            controllers[litTo].LightTurnOff(dirFrom , startNum);
         }
 	}
     public static Sprite GetSprite(string url)

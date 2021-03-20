@@ -33,9 +33,15 @@ public class ConnectImageController : MonoBehaviour , IPointerClickHandler
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.N)) Debug.Log($"{placeNum} : {GetData()}");
+        if(imageNum == 6 && isLighting) controller.Clear();
+        this.name = GetData();
     }
-    public void LightChange(bool isLit)
+    public void LightChange(bool isLit , int dirFrom ,int startNum = -1)
     {
+        dirFrom = GetNextDirection(dirFrom);
+        if(dirFrom != -1 && direction[dirFrom] == -1) return;
+        if(placeNum == startNum) return;
+
         if(isLit)
         {
             isLighting = true;
@@ -46,22 +52,41 @@ public class ConnectImageController : MonoBehaviour , IPointerClickHandler
             isLighting = false;
             image.sprite = ConnectLinesController.GetSprite(imageName + "_No");
         }
+        LightTurnStatus(isLit);
     }
-    public int CheckNextImage(int dirFrom)
+    public void CheckNextImage(int dirFrom)
 	{
         dirFrom = GetNextDirection(dirFrom);
-        Debug.Log($"{placeNum}:{dirFrom}");
-        for(int i = 0 ;i < 4 ;i++)
-		{
+        if(dirFrom != -1 && direction[dirFrom] == -1) return;
+
+        for(int i = 0 ; i < 4 ; i++)
+        {
             if(direction[i] == -1) continue;
 
             if(IsDirectionOK(i) && isLighting)
-			{
+            {
                 controller.LitImage(GetNextNumber(i) , i , true);
+            }
+        }
+        return;
+	}
+    public void LightTurnOff(int dirFrom, int startNum ,bool isFirst = false)
+	{
+        dirFrom = GetNextDirection(dirFrom);
+        if(dirFrom != -1 && direction[dirFrom] == -1) return;
+        if(!isFirst && placeNum == startNum) return;
+        if(placeNum == 5) return;
+
+        for(int i = 0 ;i < 4 ; i++)
+		{
+            if(direction[i] == -1) continue;
+
+            if(IsDirectionOK(i))
+			{
+                controller.LitImage(GetNextNumber(i) , i , false , startNum);
 			}
 		}
-        return 0;
-	}
+    }
     public void ConnectRotate(int angleCount)
     {
         this.transform.Rotate(Vector3.forward * 90 * angleCount);
@@ -88,6 +113,7 @@ public class ConnectImageController : MonoBehaviour , IPointerClickHandler
     {
         if(imageNum == 6) return;
 
+        LightTurnOff(-1 , placeNum , true);
 		ConnectRotate(1);
         CheckNextImage(-1);
 
@@ -183,6 +209,14 @@ public class ConnectImageController : MonoBehaviour , IPointerClickHandler
                 break;
         }
         return true;
+	}
+    void LightTurnStatus(bool lit)
+	{
+        for(int i = 0 ;i < 4 ;i++)
+		{
+            if(direction[i] == -1) continue;
+            direction[i] = lit ? 1 : 0;
+		} 
 	}
 }
 public enum Derection
