@@ -92,7 +92,7 @@ public class PictureMatchingController : MonoBehaviour
 	}
     Sprite GetSprite(string imagePath)
 	{
-        string url = "Images/" + imagePath;
+        string url = "Images/PictureMatching/" + imagePath;
         Sprite sp = Resources.Load<Sprite>(url);
         return sp;
 	}
