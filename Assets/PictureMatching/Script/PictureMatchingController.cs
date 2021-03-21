@@ -21,10 +21,13 @@ public class PictureMatchingController : MonoBehaviour
 
     Image clearImg;
 
+    SelectController select;
     Transform canvasTransform;
 
     int PanelCount;
     int ImageNum;
+
+    float time;
 
     bool isFinish = false;
 
@@ -33,6 +36,7 @@ public class PictureMatchingController : MonoBehaviour
         PanelCount = 0;
         this.name = "PictureMatching";
         Initialized();
+        time = Time.time;
     }
 
     void Update()
@@ -52,6 +56,7 @@ public class PictureMatchingController : MonoBehaviour
     void Initialized()
 	{
         canvasTransform = GameObject.Find("Canvas").transform;
+        select = GameObject.Find("PuzzleSelect").GetComponent<SelectController>();
 
         nullPanelIns = Instantiate(nullPanel , canvasTransform);
         nullPanelIns.name = "NullPanel";
@@ -109,6 +114,15 @@ public class PictureMatchingController : MonoBehaviour
         foreach(var obj in picturePanels) Destroy(obj);
         Destroy(nullPanelIns);
         Destroy(clearImg);
+        {
+            string sub = "";
+            float t = Time.time - time;
+            int min = (int)( t / 60 );
+            int sec = (int)( t % 60 );
+            if(sec < 10) sub = "0";
+            string result = min.ToString() + ":" + sub + sec.ToString();
+            select.EndPuzzle(result);
+        }
         Destroy(this.gameObject);
 	}
     public void PanelCountChange(bool isSubtraction)

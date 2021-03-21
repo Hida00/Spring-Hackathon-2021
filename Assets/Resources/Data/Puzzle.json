@@ -1,5 +1,5 @@
 {
-  "Count" : 2,
+  "Count" : 3,
   "Data": [
     {
       "NameUS": "Picture Matching Puzzle",
@@ -10,6 +10,11 @@
       "NameUS": "Connect Line Puzzle",
       "NameJP": "電気接続パズル",
       "Difficulty": 1
+    },
+    {
+      "NameUS": "Hockey",
+      "NameJP": "ホッケー",
+      "Difficulty": 2
     }
   ]
 }
