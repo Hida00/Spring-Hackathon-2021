@@ -7,15 +7,22 @@ public class ConnectLinesController : MonoBehaviour
 {
     [SerializeField]
     Image connectImage;
+    [SerializeField]
+    Image reStart;
+    Image restart;
     Image[] connectImages;
     ConnectImageController[] controllers;
+    SelectController select;
 	private Transform canvasTransform;
+
+    float time;
 
     //èâÇﬂÇ©ÇÁåıÇ¡ÇƒÇ¢ÇÈèÍèä
     private int startPos;
     void Start()
     {
         Initialize();
+        time = Time.time;
         Invoke(nameof(UpdateLights), 0.01f);
     }
 
@@ -29,15 +36,35 @@ public class ConnectLinesController : MonoBehaviour
 	}
     public void Finish()
 	{
-        foreach(var obj in connectImages) Destroy(obj);
-        //Destroy(this.gameObject);
+        foreach(var obj in connectImages) Destroy(obj.gameObject);
+        {
+            string sub = "";
+            float t = Time.time - time;
+            int min = (int)( t / 60 );
+            int sec = (int)( t % 60 );
+            if(sec < 10) sub = "0";
+            string result = min.ToString() + ":" + sub + sec.ToString();
+            select.EndPuzzle(result);
+        }
+        Destroy(restart.gameObject);
+        Destroy(this.gameObject);
+	}
+    public void ReStart()
+	{
+        foreach(var obj in connectImages) Destroy(obj.gameObject);
+        Destroy(restart.gameObject);
+        Initialize();
 	}
     void Initialize()
     {
         canvasTransform = GameObject.Find("Canvas").transform;
+        select = GameObject.Find("PuzzleSelect").GetComponent<SelectController>();
 
         connectImages = new Image[16];
         controllers = new ConnectImageController[16];
+
+        restart = Instantiate(reStart , canvasTransform);
+        restart.GetComponent<ReStartController>().controller = this;
 
         startPos = UnityEngine.Random.Range(0 , 15);
         int end = UnityEngine.Random.Range(0 , 16);
