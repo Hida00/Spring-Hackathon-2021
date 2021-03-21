@@ -11,9 +11,12 @@ public class ConnectLinesController : MonoBehaviour
     ConnectImageController[] controllers;
 	private Transform canvasTransform;
 
+    //初めから光っている場所
+    private int startPos;
     void Start()
     {
         Initialize();
+        Invoke(nameof(UpdateLights), 0.01f);
     }
 
     void Update()
@@ -36,10 +39,10 @@ public class ConnectLinesController : MonoBehaviour
         connectImages = new Image[16];
         controllers = new ConnectImageController[16];
 
-        int start = UnityEngine.Random.Range(0 , 15);
+        startPos = UnityEngine.Random.Range(0 , 15);
         int end = UnityEngine.Random.Range(0 , 16);
 
-        if(start == end) end = 15;
+        if(startPos == end) end = 15;
 
         for(int i = 0 ; i < 16 ; i++)
         {
@@ -57,7 +60,7 @@ public class ConnectLinesController : MonoBehaviour
 
             string imageName;
 
-            if(i == start)
+            if(i == startPos)
             {
                 imageName = "Start";
                 connectImages[i].sprite = GetSprite(imageName);
@@ -91,6 +94,53 @@ public class ConnectLinesController : MonoBehaviour
             connectImages[i].name = controllers[i].GetData();
         }
     }
+
+    public void UpdateLights()
+    {
+        //電気をすべて消す
+        foreach (ConnectImageController controller in controllers)
+        {
+            controller.isLighting = false;
+            controller.image.sprite = GetSprite(controller.imageName + "_No");
+            controller.LightTurnStatus(false);
+        }
+
+        //光っている場所からつながっているところをすべて光るようにする
+        ChangeLights(startPos);
+	}
+
+    void ChangeLights(int currentPos)
+    {
+        ConnectImageController current = controllers[currentPos];
+
+        //光るようにする
+        current.isLighting = true;
+        current.image.sprite = GetSprite(current.imageName);
+        current.LightTurnStatus(true);
+
+        //更新
+        controllers[currentPos] = current;
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (current.direction[i] == -1) continue;
+            if (!current.IsDirectionOK(i)) continue;
+
+            int next_num = current.GetNextNumber(i);
+            int opposite = current.GetNextDirection(i);
+
+            //隣と繋がっていなかったらcontinue
+            if (controllers[next_num].direction[opposite] == -1) continue;
+
+
+            if (!controllers[next_num].isLighting)
+            {
+                ChangeLights(next_num);
+			}
+		}
+	}
+
+    /*
     public void LitImage(int litTo,int dirFrom,bool isLighting ,int startNum = -1)
 	{
         if(isLighting && !controllers[litTo].isLighting)
@@ -104,6 +154,7 @@ public class ConnectLinesController : MonoBehaviour
             controllers[litTo].LightTurnOff(dirFrom , startNum);
         }
 	}
+    */
     public static Sprite GetSprite(string url)
 	{
         string path = "Images/ConnectLines/" + url;
