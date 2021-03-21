@@ -21,6 +21,8 @@ public class HockeyController : MonoBehaviour
     [NonSerialized]
     public SelectController select;
 
+    Camera MainCamera;
+
     Vector3 velocity;
 
     float time;
@@ -44,6 +46,16 @@ public class HockeyController : MonoBehaviour
         float hor = Input.GetAxis("Horizontal");
 
         float dis = Vector3.Distance(palette.transform.position , panel.transform.position);
+
+        var mouse = panel.transform.position.x;
+
+        var click = Input.GetMouseButton(0);
+        if(click)
+        {
+            mouse = MainCamera.ScreenToWorldPoint(Input.mousePosition).x;
+            if(mouse > 8.5f) mouse = 8.5f;
+            if(mouse < -8.5f) mouse = -8.5f;
+        }
 
         if(palZ >= -5.5f)
 		{
@@ -69,7 +81,11 @@ public class HockeyController : MonoBehaviour
         if(palZ < -16f) Finish();
 
         palette.transform.position += velocity * speed * Time.deltaTime;
-        if(paneX <= 8f && paneX >= -8f)
+        if(click)
+		{
+            panel.transform.position = new Vector3(mouse , panel.transform.position.y , panel.transform.position.z);
+		}
+        else if(paneX <= 8f && paneX >= -8f)
         {
             panel.transform.position += new Vector3(hor , 0 , 0) * 12f * Time.deltaTime;
         }
@@ -94,6 +110,7 @@ public class HockeyController : MonoBehaviour
 	}
     void Initialize()
     {
+        MainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
         select = GameObject.Find("PuzzleSelect").GetComponent<SelectController>();
 
         float x = UnityEngine.Random.Range(1 , 2) / 1f;

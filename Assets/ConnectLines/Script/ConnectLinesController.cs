@@ -54,7 +54,8 @@ public class ConnectLinesController : MonoBehaviour
         foreach(var obj in connectImages) Destroy(obj.gameObject);
         Destroy(restart.gameObject);
         Initialize();
-	}
+        Invoke(nameof(UpdateLights) , 0.01f);
+    }
     void Initialize()
     {
         canvasTransform = GameObject.Find("Canvas").transform;

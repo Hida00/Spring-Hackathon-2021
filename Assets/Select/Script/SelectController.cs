@@ -66,6 +66,9 @@ public class SelectController : MonoBehaviour
             PuzzlePanels[i].GetComponent<PuzzlePanelController>().select = this;
             PuzzlePanels[i].GetComponent<PuzzlePanelController>().puzzleName = puzzle.Data[i].NameUS;
             PuzzlePanels[i].name = puzzle.Data[i].NameJP;
+
+            var img = PuzzlePanels[i].transform.GetChild(3).GetComponent<Image>();
+            if(!puzzle.Data[i].Phone) img.sprite = Resources.Load<Sprite>("Images/Select/sign");
         }
     }
     public void StartPuzzle(string name)
@@ -98,6 +101,7 @@ public class DataItem
     public string NameUS;
     public string NameJP;
     public int Difficulty;
+    public bool Phone;
 }
 
 

@@ -4,17 +4,20 @@
     {
       "NameUS": "Picture Matching Puzzle",
       "NameJP": "絵合わせパズル",
-      "Difficulty": 1
+      "Difficulty": 1,
+      "Phone": true
     },
     {
       "NameUS": "Connect Line Puzzle",
       "NameJP": "電気接続パズル",
-      "Difficulty": 1
+      "Difficulty": 1,
+      "Phone": true
     },
     {
       "NameUS": "Hockey",
       "NameJP": "ホッケー",
-      "Difficulty": 2
+      "Difficulty": 2,
+      "Phone": true
     }
   ]
 }
