@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 
 public class ConnectImageController : MonoBehaviour , IPointerClickHandler
 {
-    int[] direction;
+    public int[] direction;
 
     [NonSerialized]
     public int placeNum;
@@ -21,7 +21,7 @@ public class ConnectImageController : MonoBehaviour , IPointerClickHandler
     [NonSerialized]
     public ConnectLinesController controller;
 
-    Image image;
+    public Image image;
 
     [NonSerialized]
     public bool isLighting; 
@@ -36,6 +36,7 @@ public class ConnectImageController : MonoBehaviour , IPointerClickHandler
         if(imageNum == 6 && isLighting) controller.Clear();
         this.name = GetData();
     }
+    /*
     public void LightChange(bool isLit , int dirFrom ,int startNum = -1)
     {
         dirFrom = GetNextDirection(dirFrom);
@@ -87,6 +88,7 @@ public class ConnectImageController : MonoBehaviour , IPointerClickHandler
 			}
 		}
     }
+    */
     public void ConnectRotate(int angleCount)
     {
         this.transform.Rotate(Vector3.forward * 90 * angleCount);
@@ -113,9 +115,12 @@ public class ConnectImageController : MonoBehaviour , IPointerClickHandler
     {
         if(imageNum == 6) return;
 
-        LightTurnOff(-1 , placeNum , true);
-		ConnectRotate(1);
-        CheckNextImage(-1);
+        //LightTurnOff(-1 , placeNum , true);
+        //ConnectRotate(1);
+        //CheckNextImage(-1);
+
+        ConnectRotate(1);
+        controller.UpdateLights();
 
         //Debug.Log($"{placeNum} : {GetData()}");
 	}
@@ -147,7 +152,7 @@ public class ConnectImageController : MonoBehaviour , IPointerClickHandler
         }
     }
     public string GetData() => $"(U:{direction[0]},D:{direction[1]},R:{direction[2]},L:{direction[3]})";
-    int GetNextDirection(int dir)
+    public int GetNextDirection(int dir)
 	{
         switch(dir)
 		{
@@ -163,7 +168,7 @@ public class ConnectImageController : MonoBehaviour , IPointerClickHandler
                 return -1;
 		}
 	}
-    int GetNextNumber(int dir)
+    public int GetNextNumber(int dir)
 	{
         switch(dir)
 		{
@@ -210,7 +215,7 @@ public class ConnectImageController : MonoBehaviour , IPointerClickHandler
         }
         return true;
 	}
-    void LightTurnStatus(bool lit)
+    public void LightTurnStatus(bool lit)
 	{
         for(int i = 0 ;i < 4 ;i++)
 		{
