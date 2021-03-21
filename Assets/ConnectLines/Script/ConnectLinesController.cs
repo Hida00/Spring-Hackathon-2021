@@ -9,9 +9,7 @@ public class ConnectLinesController : MonoBehaviour
     Image connectImage;
     Image[] connectImages;
     ConnectImageController[] controllers;
-
-    [SerializeField]
-    Transform canvasTransform;
+	private Transform canvasTransform;
 
     void Start()
     {
@@ -32,7 +30,9 @@ public class ConnectLinesController : MonoBehaviour
         //Destroy(this.gameObject);
 	}
     void Initialize()
-	{
+    {
+        canvasTransform = GameObject.Find("Canvas").transform;
+
         connectImages = new Image[16];
         controllers = new ConnectImageController[16];
 
