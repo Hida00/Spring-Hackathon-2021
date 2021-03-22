@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,9 +9,15 @@ public class PutBlock : MonoBehaviour
     public const int width = 6;
 
     private GameObject[] blocks;
+    private GameObject Rotate;
+
+    [NonSerialized]
+    public GameObject SelectBlock;
 
     SelectController select;
     float time;
+
+    bool isClear = false;
 
     void Start()
     {
@@ -35,24 +42,31 @@ public class PutBlock : MonoBehaviour
         for (int i = 1; i <= 8; i++)
         {
             blocks[i] = Instantiate((GameObject)Resources.Load("Images/BlockPuzzle/group" + i.ToString()));
+            blocks[i].GetComponent<Test>().putBlock = this;
+            SelectBlock = blocks[i];
         }
+        Rotate = Instantiate((GameObject)Resources.Load("Images/BlockPuzzle/Rotate") , GameObject.Find("Canvas").transform);
+        Rotate.GetComponent<BlockRotate>().putBlock = this;
     }
 
-    void Finish()
+    public void Finish()
     {
         //ÉJÉÅÉâÇÃà íuÇå≥Ç…ñﬂÇ∑
-        GameObject.Find("Main Camera").transform.Rotate(90, 0, 0);
+        GameObject.Find("Main Camera").transform.Rotate(90 , 0 , 0);
 
-        foreach (GameObject block in blocks) Destroy(block);
+        foreach(GameObject block in blocks) Destroy(block);
+        Destroy(Rotate);
         Destroy(this.gameObject);
-
-        string sub = "";
-        float t = Time.time - time;
-        int min = (int)(t / 60);
-        int sec = (int)(t % 60);
-        if (sec < 10) sub = "0";
-        string result = min.ToString() + ":" + sub + sec.ToString();
-        select.EndPuzzle(result);
+        if(isClear)
+        {
+            string sub = "";
+            float t = Time.time - time;
+            int min = (int)( t / 60 );
+            int sec = (int)( t % 60 );
+            if(sec < 10) sub = "0";
+            string result = min.ToString() + ":" + sub + sec.ToString();
+            select.EndPuzzle(result);
+        }
     }
 
     public bool checkIsAllCorrect()
@@ -69,6 +83,7 @@ public class PutBlock : MonoBehaviour
         }
         Debug.Log("All Correct!!");
         //Finish();
+        isClear = true;
         Invoke(nameof(Finish), 1.5f);
         return true;
     }

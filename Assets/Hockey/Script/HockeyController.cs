@@ -28,6 +28,8 @@ public class HockeyController : MonoBehaviour
     float time;
     float speed;
 
+    bool isClear = false;
+
     void Start()
     {
         Initialize();
@@ -78,7 +80,11 @@ public class HockeyController : MonoBehaviour
             palette.transform.position += Vector3.right * 0.15f;
         }
 
-        if(palZ < -16f) Finish();
+        if(palZ < -16f)
+        {
+            isClear = true;
+            Finish();
+        }
 
         palette.transform.position += velocity * speed * Time.deltaTime;
         if(click)
@@ -92,11 +98,13 @@ public class HockeyController : MonoBehaviour
         else if(paneX <= 8f) panel.transform.position += Vector3.right * 0.2f;
         else if(paneX >= 8f) panel.transform.position += Vector3.left * 0.2f;
     }
-    void Finish()
+    public void Finish()
 	{
+        MainCamera.transform.position = new Vector3(-2.5f , 4.5f , -10);
         Destroy(palette);
         Destroy(panel);
         Destroy(floor);
+        if(isClear)
         {
             string sub = "";
             float t = Time.time - time;
@@ -106,12 +114,17 @@ public class HockeyController : MonoBehaviour
             string result = min.ToString() + ":" + sub + sec.ToString();
             select.EndPuzzle(result);
         }
+        MainCamera.orthographic = false;
         Destroy(this.gameObject);
 	}
     void Initialize()
     {
         MainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
         select = GameObject.Find("PuzzleSelect").GetComponent<SelectController>();
+
+        MainCamera.transform.position = new Vector3(0 , 0 , -10);
+        MainCamera.orthographic = true;
+        MainCamera.orthographicSize = 7;
 
         float x = UnityEngine.Random.Range(1 , 2) / 1f;
         float z = UnityEngine.Random.Range(1 , 2) / 1f;

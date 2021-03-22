@@ -14,8 +14,8 @@ public class PuzzlePanelController : MonoBehaviour , IPointerClickHandler
 
     public void OnPointerClick(PointerEventData e)
 	{
-		Instantiate(controller);
-		select.StartPuzzle(puzzleName);
+		var obj = Instantiate(controller);
+		select.StartPuzzle(puzzleName , obj);
 	}
 
 	public void SetController(GameObject ctr) => controller = ctr;
