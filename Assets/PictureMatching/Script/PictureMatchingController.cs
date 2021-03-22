@@ -29,6 +29,7 @@ public class PictureMatchingController : MonoBehaviour
 
     float time;
 
+    bool isClear = true;
     bool isFinish = false;
 
     void Start()
@@ -108,12 +109,15 @@ public class PictureMatchingController : MonoBehaviour
         clearImg.rectTransform.sizeDelta = new Vector2(300 , 300);
         clearImg.rectTransform.anchoredPosition = new Vector2(0 , 0);
         clearImg.sprite = GetSprite(SetImages(ImageNum));
+        isClear = false;
     }
-    void Finish()
+    public void Finish()
 	{
+        if(isClear) foreach(var obj in pictureParts) Destroy(obj);
         foreach(var obj in picturePanels) Destroy(obj);
         Destroy(nullPanelIns);
         Destroy(clearImg);
+        if(!isClear)
         {
             string sub = "";
             float t = Time.time - time;

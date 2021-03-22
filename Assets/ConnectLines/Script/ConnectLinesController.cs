@@ -16,6 +16,7 @@ public class ConnectLinesController : MonoBehaviour
 	private Transform canvasTransform;
 
     float time;
+    bool isClear = false;
 
     //‰‚ß‚©‚çŒõ‚Á‚Ä‚¢‚éêŠ
     private int startPos;
@@ -32,11 +33,13 @@ public class ConnectLinesController : MonoBehaviour
     }
     public void Clear()
 	{
+        isClear = true;
         Invoke(nameof(Finish) , 1.5f);
 	}
     public void Finish()
 	{
         foreach(var obj in connectImages) Destroy(obj.gameObject);
+        if(isClear)
         {
             string sub = "";
             float t = Time.time - time;

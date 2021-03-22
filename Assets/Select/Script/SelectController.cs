@@ -15,6 +15,12 @@ public class SelectController : MonoBehaviour
     GameObject scrol;
 
     [SerializeField]
+    Image Pause;
+
+    [SerializeField]
+    GameObject PausePanel;
+
+    [SerializeField]
     GameObject ResultPanel;
 
     [SerializeField]
@@ -23,6 +29,7 @@ public class SelectController : MonoBehaviour
     Transform canvasTransform;
 
     public GameObject[] Controllers;
+    GameObject pauseObj;
 
     string puzzleName;
 
@@ -71,22 +78,55 @@ public class SelectController : MonoBehaviour
             if(!puzzle.Data[i].Phone) img.sprite = Resources.Load<Sprite>("Images/Select/sign");
         }
     }
-    public void StartPuzzle(string name)
+    public void StartPuzzle(string name, GameObject obj)
 	{
         SetActiveScroll(false);
         puzzleName = name;
+        pauseObj = obj;
 	}
     public void EndPuzzle(string resultText)
 	{
         ResultPanel.SetActive(true);
         string playerName = input.text;
         if(playerName == "") playerName = "None";
-        ResultPanel.GetComponent<ResultController>().SetResult(resultText , puzzleName , this , playerName );
-	}
+        ResultPanel.GetComponent<ResultController>().SetResult(resultText , puzzleName , this , playerName);
+    }
     public void SetActiveScroll(bool isActive)
     {
         scrol.SetActive(isActive);
         input.transform.parent.gameObject.SetActive(isActive);
+        Pause.gameObject.SetActive(!isActive);
+    }
+    public void ClickPause()
+	{
+        Time.timeScale = 0;
+        PausePanel.SetActive(true);
+	}
+    public void ReturnGame()
+	{
+        Time.timeScale = 1;
+        PausePanel.SetActive(false);
+	}
+    public void ReturnTitle()
+	{
+        Time.timeScale = 1;
+        PausePanel.SetActive(false);
+
+        if(puzzleName == "Picture Matching Puzzle") pauseObj.GetComponent<PictureMatchingController>().Finish();
+        else if(puzzleName == "Connect Line Puzzle")
+        {
+            pauseObj.GetComponent<ConnectLinesController>().Finish();
+        }
+        else if(puzzleName == "Hockey")
+        {
+            pauseObj.GetComponent<HockeyController>().Finish();
+        }
+        else if(puzzleName == "BlockPuzzle")
+        {
+            pauseObj.GetComponent<PutBlock>().Finish();
+        }
+
+        SetActiveScroll(true);
     }
 }
 [Serializable]
